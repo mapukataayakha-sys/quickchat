@@ -48,13 +48,6 @@ public class Login {
         return hasUppercase && hasNumber && hasSpecialChar;
     }
 
-    /**
-     * Validates international phone number format using regex pattern.
-     * Pattern: + (international code) followed by 9-10 digit local number
-     * Example: +27838968976 (South Africa)
-     * Reference: Regular Expression patterns for international phone numbers
-     * https://stackoverflow.com/questions/14894993/validate-phone-number-with-regex
-     */
     public boolean checkCellPhoneNumber() {
         // Pattern: + followed by country code (1-3 digits) + local number (9-10 digits)
         String pattern = "^\\+\\d{1,3}\\d{9,10}$";
