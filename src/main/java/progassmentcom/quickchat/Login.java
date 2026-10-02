@@ -1,11 +1,14 @@
 package progassmentcom.quickchat;
 
 public class Login {
-    String username;
-    String password;
-    String cellPhoneNumber;
-    String firstName;
-    String lastName;
+    private static final int MAX_USERNAME_LENGTH = 5;
+    private static final String PHONE_PATTERN = "^\\+\\d{1,3}\\d{9,10}$";
+
+    private String username;
+    private String password;
+    private String cellPhoneNumber;
+    private String firstName;
+    private String lastName;
 
     public Login(String username, String password, String cellPhoneNumber) {
         this.username = username;
@@ -16,11 +19,9 @@ public class Login {
     }
 
     public boolean checkUserName() {
-        // Username must contain underscore AND be 5 characters or fewer
-        if (username == null) {
-            return false;
-        }
-        return username.contains("_") && username.length() <= 5;
+        return username != null
+                && username.contains("_")
+                && username.length() <= MAX_USERNAME_LENGTH;
     }
 
     public boolean checkPasswordComplexity() {
@@ -39,7 +40,6 @@ public class Login {
             if (Character.isDigit(c)) {
                 hasNumber = true;
             }
-            // Special characters are anything that isn't alphanumeric
             if (!Character.isLetterOrDigit(c)) {
                 hasSpecialChar = true;
             }
@@ -49,9 +49,7 @@ public class Login {
     }
 
     public boolean checkCellPhoneNumber() {
-        // Pattern: + followed by country code (1-3 digits) + local number (9-10 digits)
-        String pattern = "^\\+\\d{1,3}\\d{9,10}$";
-        return cellPhoneNumber != null && cellPhoneNumber.matches(pattern);
+        return cellPhoneNumber != null && cellPhoneNumber.matches(PHONE_PATTERN);
     }
 
     public String registerUser() {
@@ -68,14 +66,16 @@ public class Login {
     }
 
     public boolean loginUser(String enteredUsername, String enteredPassword) {
-        // Check if entered credentials match stored credentials
+        if (enteredUsername == null || enteredPassword == null) {
+            return false;
+        }
+
         return this.username != null && this.username.equals(enteredUsername)
                 && this.password != null && this.password.equals(enteredPassword);
     }
 
     public String returnLoginStatus(boolean loginSuccess) {
         if (loginSuccess) {
-            // Build welcome message with first and last name if provided
             String displayFirst = (firstName == null || firstName.isBlank()) ? "User" : firstName;
             String displayLast = (lastName == null || lastName.isBlank()) ? "" : lastName;
 
@@ -103,7 +103,15 @@ public class Login {
         this.firstName = firstName;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 }
