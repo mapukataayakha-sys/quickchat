@@ -1,0 +1,22 @@
+# Maven
+target/
+.m2/
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+*.class
+.classpath
+.project
+.settings/
