@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Random;
 
 public class Message {
-    // Strict South African format only: +27 followed by exactly 9 digits.
     private static final String RECIPIENT_PATTERN = "^\\+27\\d{9}$";
 
     String messageID;
@@ -26,24 +26,21 @@ public class Message {
         this.messageSent = false;
         this.messageReceived = false;
         this.messageRead = false;
+        this.messageHash = "";
 
-        // Generate a random 10-digit ID for each message
         Random random = new Random();
         this.messageID = String.format("%010d", random.nextInt(1_000_000_000));
     }
 
     public boolean checkMessageID() {
-        // Verify that message ID was generated as a 10-digit string
-        return messageID != null && messageID.length() == 10;
+        return messageID != null && messageID.matches("\\d{1,10}");
     }
 
-    // Boolean validator so callers don't have to parse the message to validate the number
     public boolean isRecipientValid() {
         return recipient != null && recipient.matches(RECIPIENT_PATTERN);
     }
 
     public String checkRecipientCell() {
-        
         if (isRecipientValid()) {
             return "Cell phone number successfully captured.";
         }
@@ -51,7 +48,6 @@ public class Message {
     }
 
     public String createMessageHash() {
-        // Hash format: first 2 digits of ID : message number : first + last word of message
         String firstTwoDigits = (messageID != null && messageID.length() >= 2)
                 ? messageID.substring(0, 2)
                 : "00";
@@ -60,13 +56,23 @@ public class Message {
                 ? new String[]{"MESSAGE"}
                 : messageContent.trim().split("\\s+");
 
-        String firstWord = words[0].toUpperCase();
-        String lastWord = words[words.length - 1].toUpperCase();
-        messageHash = firstTwoDigits + ":" + messageNumber + ":" + firstWord + lastWord;
+        String firstWord = normaliseWord(words[0]);
+        String lastWord = normaliseWord(words[words.length - 1]);
+        if (firstWord.isEmpty()) {
+            firstWord = "MESSAGE";
+        }
+        if (lastWord.isEmpty()) {
+            lastWord = "MESSAGE";
+        }
+
+        messageHash = firstTwoDigits + ":" + messageNumber + ":" + firstWord.toUpperCase() + lastWord.toUpperCase();
         return messageHash;
     }
 
-    // Boolean validator for message length validation
+    private String normaliseWord(String word) {
+        return word == null ? "" : word.replaceAll("[^A-Za-z0-9?]", "");
+    }
+
     public boolean isMessageLengthValid() {
         return messageContent != null && messageContent.length() <= 250;
     }
@@ -75,13 +81,12 @@ public class Message {
         if (isMessageLengthValid()) {
             return "Message ready to send.";
         }
-        // Calculate how many characters over the limit
+
         int exceededBy = (messageContent == null) ? 250 : messageContent.length() - 250;
         return "Message exceeds 250 characters by " + exceededBy + "; please reduce the size.";
     }
 
     public String sentMessage(int userChoice) {
-        // Return the appropriate response based on user's send choice
         switch (userChoice) {
             case 1:
                 messageSent = true;
@@ -95,7 +100,10 @@ public class Message {
         }
     }
 
-    // Setters allow input re-prompting without rebuilding the object
+    public String sentMessage() {
+        return sentMessage(1);
+    }
+
     public void setRecipient(String recipient) {
         this.recipient = recipient;
     }
@@ -104,20 +112,18 @@ public class Message {
         this.messageContent = messageContent;
     }
 
-    
-    public void storeToJSON(String filename) {
-        try {
+    public void storeMessage(String filename) {
+        try (Writer writer = new FileWriter(filename, true)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String json = gson.toJson(this);
-
-            FileWriter writer = new FileWriter(filename, true);
-            writer.write(json + "\n");
-            writer.close();
-
-            System.out.println("Message stored to " + filename);
+            writer.write(gson.toJson(this));
+            writer.write(System.lineSeparator());
         } catch (IOException e) {
             System.out.println("Error storing message: " + e.getMessage());
         }
+    }
+
+    public void storeToJSON(String filename) {
+        storeMessage(filename);
     }
 
     public void printMessage() {
@@ -125,6 +131,13 @@ public class Message {
         System.out.println("Message Hash: " + messageHash);
         System.out.println("Recipient: " + recipient);
         System.out.println("Message: " + messageContent);
+    }
+
+    public String printMessages() {
+        return "Message ID: " + messageID + System.lineSeparator()
+                + "Message Hash: " + messageHash + System.lineSeparator()
+                + "Recipient: " + recipient + System.lineSeparator()
+                + "Message: " + messageContent;
     }
 
     public String getMessageID() {
@@ -169,5 +182,9 @@ public class Message {
 
     public boolean isMessageRead() {
         return messageRead;
+    }
+
+    public int returnTotalMessages() {
+        return 1;
     }
 }
