@@ -2,15 +2,16 @@ package progassmentcom.quickchat;
 
 public class Login {
     private static final int MAX_USERNAME_LENGTH = 5;
-    // Regex for international phone: + followed by 1-3 country code digits, then 9-10 number digits
-    // Reference: https://en.wikipedia.org/wiki/E.164
-    private static final String PHONE_PATTERN = "^\\+\\d{1,3}\\d{9,10}$";
+    private static final String USERNAME_PATTERN = "^(?=.*_)[A-Za-z0-9_]{1,5}$";
+    private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
+    private static final String PHONE_PATTERN = "^\\+27\\d{9}$";
 
     private String username;
     private String password;
     private String cellPhoneNumber;
     private String firstName;
     private String lastName;
+    private boolean lastLoginSuccess;
 
     public Login(String username, String password, String cellPhoneNumber) {
         this.username = username;
@@ -18,36 +19,15 @@ public class Login {
         this.cellPhoneNumber = cellPhoneNumber;
         this.firstName = "";
         this.lastName = "";
+        this.lastLoginSuccess = false;
     }
 
     public boolean checkUserName() {
-        return username != null
-                && username.contains("_")
-                && username.length() <= MAX_USERNAME_LENGTH;
+        return username != null && username.matches(USERNAME_PATTERN);
     }
 
     public boolean checkPasswordComplexity() {
-        if (password == null || password.length() < 8) {
-            return false;
-        }
-
-        boolean hasUppercase = false;
-        boolean hasNumber = false;
-        boolean hasSpecialChar = false;
-
-        for (char c : password.toCharArray()) {
-            if (Character.isUpperCase(c)) {
-                hasUppercase = true;
-            }
-            if (Character.isDigit(c)) {
-                hasNumber = true;
-            }
-            if (!Character.isLetterOrDigit(c)) {
-                hasSpecialChar = true;
-            }
-        }
-
-        return hasUppercase && hasNumber && hasSpecialChar;
+        return password != null && password.matches(PASSWORD_PATTERN);
     }
 
     public boolean checkCellPhoneNumber() {
@@ -62,9 +42,21 @@ public class Login {
             return "Password is not correctly formatted; please ensure that the password contains at least eight characters, a capital letter, a number, and a special character.";
         }
         if (!checkCellPhoneNumber()) {
-            return "Cell number is incorrectly formatted or does not contain an international code; please correct the number and try again.";
+            return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
         }
         return "User successfully registered.";
+    }
+
+    public String registerUser(String username, String password, String cellPhoneNumber) {
+        this.username = username;
+        this.password = password;
+        this.cellPhoneNumber = cellPhoneNumber;
+        return registerUser();
+    }
+
+    public boolean loginUser() {
+        lastLoginSuccess = this.username != null && this.password != null;
+        return lastLoginSuccess;
     }
 
     public boolean loginUser(String enteredUsername, String enteredPassword) {
@@ -72,8 +64,13 @@ public class Login {
             return false;
         }
 
-        return this.username != null && this.username.equals(enteredUsername)
+        lastLoginSuccess = this.username != null && this.username.equals(enteredUsername)
                 && this.password != null && this.password.equals(enteredPassword);
+        return lastLoginSuccess;
+    }
+
+    public String returnLoginStatus() {
+        return returnLoginStatus(lastLoginSuccess);
     }
 
     public String returnLoginStatus(boolean loginSuccess) {
