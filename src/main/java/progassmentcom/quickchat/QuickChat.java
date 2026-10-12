@@ -66,7 +66,11 @@ public class QuickChat {
             switch (menuChoice) {
                 case 1 -> sendMessages(scanner, sentMessages, storedMessages, disregardedMessages);
                 case 2 -> {
-                    System.out.println("Coming Soon.");
+                    if (sentMessages.isEmpty()) {
+                        System.out.println("No recently sent messages.");
+                    } else {
+                        displayReport(sentMessages);
+                    }
                 }
                 case 3 -> {
                     System.out.println("Total messages sent: " + sentMessages.size());
