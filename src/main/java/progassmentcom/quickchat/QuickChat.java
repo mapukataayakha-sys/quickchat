@@ -73,7 +73,7 @@ public class QuickChat {
                     }
                 }
                 case 3 -> {
-                    System.out.println("Total messages sent: " + sentMessages.size());
+                    System.out.println("Total messages sent: " + returnTotalMessages(sentMessages));
                     appRunning = false;
                 }
                 default -> System.out.println("Invalid option. Please try again.");
@@ -130,6 +130,10 @@ public class QuickChat {
                 }
             }
         }
+    }
+
+    public static int returnTotalMessages(ArrayList<Message> sentMessages) {
+        return sentMessages.size();
     }
 
     private static int readInt(Scanner scanner) {
