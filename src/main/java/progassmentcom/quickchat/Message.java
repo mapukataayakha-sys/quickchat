@@ -1,7 +1,6 @@
 package progassmentcom.quickchat;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -114,7 +113,8 @@ public class Message {
 
     public void storeMessage(String filename) {
         try (Writer writer = new FileWriter(filename, true)) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            // One compact JSON object per line so readStoredMessagesFromJSON can parse it back
+            Gson gson = new Gson();
             writer.write(gson.toJson(this));
             writer.write(System.lineSeparator());
         } catch (IOException e) {
@@ -182,9 +182,5 @@ public class Message {
 
     public boolean isMessageRead() {
         return messageRead;
-    }
-
-    public int returnTotalMessages() {
-        return 1;
     }
 }
