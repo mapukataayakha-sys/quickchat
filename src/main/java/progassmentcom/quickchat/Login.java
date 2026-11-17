@@ -1,7 +1,6 @@
 package progassmentcom.quickchat;
 
 public class Login {
-    private static final int MAX_USERNAME_LENGTH = 5;
     private static final String USERNAME_PATTERN = "^(?=.*_)[A-Za-z0-9_]{1,5}$";
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
     private static final String PHONE_PATTERN = "^\\+27\\d{9}$";
